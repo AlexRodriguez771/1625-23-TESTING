@@ -4,11 +4,12 @@
 
 package frc.robot;
 
+
+import com.ctre.phoenix.motorcontrol.can.*;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
 
 /**
  * This is a demo program showing the use of the DifferentialDrive class, specifically it contains
@@ -18,9 +19,10 @@ public class Robot extends TimedRobot {
   private DifferentialDrive m_myRobot;
   private Joystick m_leftStick;
   private Joystick m_rightStick;
+private final Timer m_timer = new Timer();
 
-  private final MotorController m_leftMotor = new PWMSparkMax(0);
-  private final MotorController m_rightMotor = new PWMSparkMax(1);
+  private final WPI_TalonSRX m_leftMotor = new WPI_TalonSRX(0);
+  private final WPI_TalonSRX m_rightMotor = new WPI_TalonSRX(1);
 
   @Override
   public void robotInit() {
@@ -33,6 +35,25 @@ public class Robot extends TimedRobot {
     m_leftStick = new Joystick(0);
     m_rightStick = new Joystick(1);
   }
+
+   /** This function is run once each time the robot enters autonomous mode. */
+   @Override
+   public void autonomousInit() {
+     m_timer.reset();
+     m_timer.start();
+   }
+ 
+   /** This function is called periodically during autonomous. */
+   @Override
+   public void autonomousPeriodic() {
+     // Drive for 2 seconds
+     if (m_timer.get() < 2.0) {
+       // Drive forwards half speed, make sure to turn input squaring off
+       m_myRobot.tankDrive(0.5, 0.0, false);
+     } else {
+       m_myRobot.stopMotor(); // stop robot
+     }
+   }
 
   @Override
   public void teleopPeriodic() {
